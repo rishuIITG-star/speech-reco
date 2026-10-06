@@ -34,7 +34,7 @@ def extract_set(text: str, target_set: set, is_negation=False) -> Counter:
             found.append("not") # Normalize n't to not
     return Counter(found)
 
-def validate_segment(original: str, refined: str) -> tuple[bool, str]:
+def validate_segment(original: str, refined: str, glossary: list = None) -> tuple[bool, str]:
     if extract_numbers(original) != extract_numbers(refined):
         return False, "Numbers changed"
         
@@ -43,6 +43,12 @@ def validate_segment(original: str, refined: str) -> tuple[bool, str]:
         
     if extract_set(original, MODALS) != extract_set(refined, MODALS):
         return False, "Modals/Commitments changed"
+        
+    if glossary:
+        for term in glossary:
+            term_lower = term.lower()
+            if term_lower in original.lower() and term_lower not in refined.lower():
+                return False, f"Removed glossary term: {term}"
         
     # Word-level change ratio (max 15% change)
     orig_words = original.split()

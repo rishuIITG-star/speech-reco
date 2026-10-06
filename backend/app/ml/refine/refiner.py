@@ -28,6 +28,7 @@ def refine(transcript: Transcript, glossary: list = None) -> RefinedTranscript:
     candidates = get_candidates(transcript, glossary) if glossary else {}
     
     refined_segments = []
+    all_edits = []
     
     # Chunking logic
     CHUNK_SIZE = 30
@@ -43,27 +44,63 @@ def refine(transcript: Transcript, glossary: list = None) -> RefinedTranscript:
         try:
             response_text = llm.generate(system_prompt, user_prompt, response_format="json")
             response_data = json.loads(response_text)
-            refined_data = response_data.get("segments", [])
+            edits_data = response_data.get("edits", [])
             
             # Map LLM output
-            refined_map = {item["id"]: item["refined_text"] for item in refined_data if "id" in item and "refined_text" in item}
+            edits_by_seg = {}
+            for e in edits_data:
+                if "segment_id" in e and "original" in e and "corrected" in e:
+                    sid = e["segment_id"]
+                    if sid not in edits_by_seg:
+                        edits_by_seg[sid] = []
+                    edits_by_seg[sid].append(e)
             
             for seg in chunk:
                 original = seg.text
-                refined = refined_map.get(seg.id, None)
+                seg_edits = edits_by_seg.get(seg.id, [])
                 
-                if refined is None:
-                    # Fallback if missing
+                if not seg_edits:
                     refined_segments.append(RefinedSegment(id=seg.id, text=original, speaker_id=seg.speaker_id, speaker_name=seg.speaker_name, overlap=seg.overlap, start=seg.start, end=seg.end, changed=False))
                     continue
                     
-                is_valid, reason = validate_segment(original, refined)
-                if not is_valid:
-                    print(f"Segment {seg.id} failed validation: {reason}. Falling back to raw.")
-                    refined_segments.append(RefinedSegment(id=seg.id, text=original, speaker_id=seg.speaker_id, speaker_name=seg.speaker_name, overlap=seg.overlap, start=seg.start, end=seg.end, changed=False))
-                else:
-                    is_changed = original != refined
-                    refined_segments.append(RefinedSegment(id=seg.id, text=refined, speaker_id=seg.speaker_id, speaker_name=seg.speaker_name, overlap=seg.overlap, start=seg.start, end=seg.end, changed=is_changed))
+                refined = original
+                applied_edits_for_seg = []
+                for e in seg_edits:
+                    if e["original"] in refined:
+                        new_refined = refined.replace(e["original"], e["corrected"], 1)
+                        is_valid, reason = validate_segment(original, new_refined, glossary)
+                        
+                        edit_obj = Edit(
+                            segment_id=seg.id,
+                            original=e["original"],
+                            corrected=e["corrected"],
+                            reason=e.get("reason", ""),
+                            status="applied",
+                            reject_reason=None
+                        )
+                        
+                        if is_valid:
+                            refined = new_refined
+                            applied_edits_for_seg.append(edit_obj)
+                            all_edits.append(edit_obj)
+                        else:
+                            edit_obj.status = "rejected"
+                            edit_obj.reject_reason = reason
+                            all_edits.append(edit_obj)
+                            print(f"Edit on Segment {seg.id} rejected: {reason}")
+                    else:
+                        edit_obj = Edit(
+                            segment_id=seg.id,
+                            original=e["original"],
+                            corrected=e["corrected"],
+                            reason=e.get("reason", ""),
+                            status="rejected",
+                            reject_reason="Substring not found in text"
+                        )
+                        all_edits.append(edit_obj)
+                
+                is_changed = original != refined
+                refined_segments.append(RefinedSegment(id=seg.id, text=refined, speaker_id=seg.speaker_id, speaker_name=seg.speaker_name, overlap=seg.overlap, start=seg.start, end=seg.end, changed=is_changed))
                     
         except Exception as e:
             from app.core.errors import AppError
@@ -71,7 +108,7 @@ def refine(transcript: Transcript, glossary: list = None) -> RefinedTranscript:
         
     return RefinedTranscript(
         segments=refined_segments,
-        edits=[],
+        edits=all_edits,
         refiner_model=llm.model,
         refiner_status="ok"
     )

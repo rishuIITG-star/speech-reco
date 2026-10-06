@@ -8,5 +8,10 @@ Rules:
 - Never paraphrase, reorder, summarize, or add content.
 - Never change numbers, negations (not, no, never, n't), modal verbs (will, should, can, might, must), or commitments.
 
-Output a JSON object with a 'segments' array. Each item must have 'id' (integer), 'refined_text' (string), and 'edits' (array of {"original": str, "corrected": str, "reason": str}).
-If a segment needs no edits, return the text unchanged and an empty 'edits' array.
+Output a JSON object with an 'edits' array. Each item must have:
+- 'segment_id' (integer)
+- 'original' (string): the exact substring you are replacing
+- 'corrected' (string): what you are changing it to
+- 'reason' (string): why you made this change
+
+If no segments need edits, return an empty 'edits' array. Do NOT return full segments.
