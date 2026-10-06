@@ -98,6 +98,45 @@ def get_results(job_id: str, current_user: User = Depends(get_current_user), db:
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error reading results")
 
+from pydantic import BaseModel
+from typing import Any
+
+class SaveResultsRequest(BaseModel):
+    action_items: Optional[list[Any]] = None
+    decisions: Optional[list[Any]] = None
+
+@router.post("/results/{job_id}/save")
+def save_results(job_id: str, request: SaveResultsRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    meeting = db.query(Meeting).filter(Meeting.job_id == job_id, Meeting.user_id == current_user.id).first()
+    if not meeting:
+        raise HTTPException(status_code=404, detail="Meeting not found")
+        
+    job = JobStatus(job_id)
+    record_path = job.job_dir / "record.json"
+    if not record_path.exists():
+        raise HTTPException(status_code=404, detail="Record not found")
+        
+    with open(record_path, "r", encoding="utf-8") as f:
+        record = json.load(f)
+        
+    if request.action_items is not None:
+        record["action_items"] = request.action_items
+    if request.decisions is not None:
+        record["decisions"] = request.decisions
+    
+    with open(record_path, "w", encoding="utf-8") as f:
+        json.dump(record, f, indent=2)
+        
+    minutes_json = json.loads(meeting.minutes_json) if meeting.minutes_json else {}
+    if request.action_items is not None:
+        minutes_json["action_items"] = request.action_items
+    if request.decisions is not None:
+        minutes_json["decisions"] = request.decisions
+    meeting.minutes_json = json.dumps(minutes_json)
+    db.commit()
+    
+    return {"status": "ok"}
+
 @router.get("/audio/{job_id}")
 def get_audio(job_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     meeting = db.query(Meeting).filter(Meeting.job_id == job_id, Meeting.user_id == current_user.id).first()

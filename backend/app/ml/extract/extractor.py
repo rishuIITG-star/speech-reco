@@ -25,7 +25,8 @@ def extract_record(job_id: str, transcript: RefinedTranscript, asr_model: str) -
     
     system_prompt += f"\n\nJSON Schema to output:\n{json.dumps(MeetingRecord.model_json_schema(), indent=2)}"
     
-    user_prompt = "Transcript:\n"
+    current_date = datetime.utcnow().strftime("%Y-%m-%d")
+    user_prompt = f"Meeting Date: {current_date}\n\nTranscript:\n"
     for seg in transcript.segments:
         user_prompt += f"[{seg.id} | 00:00] {seg.text}\n"
         

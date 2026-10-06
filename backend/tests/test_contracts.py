@@ -101,3 +101,19 @@ def test_search_contract():
     if len(data) > 0:
         assert "job_id" in data[0]
         assert "title" in data[0]
+
+@patch("app.api.routes.JobStatus")
+@patch("builtins.open")
+@patch("json.load")
+@patch("json.dump")
+def test_save_results_contract(mock_dump, mock_load, mock_open, mock_job_status):
+    """Verify POST /results/{job_id}/save updates record and returns 200."""
+    mock_instance = mock_job_status.return_value
+    mock_instance.job_dir = MagicMock()
+    mock_instance.job_dir.__truediv__.return_value.exists.return_value = True
+    
+    mock_load.return_value = {"action_items": [], "decisions": []}
+    
+    response = client.post("/api/results/test-job-123/save", json={"action_items": [{"task": "Edited"}], "decisions": []})
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}

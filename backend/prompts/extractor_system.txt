@@ -17,7 +17,7 @@ Every decision, proposal and action item MUST include an array of `segment_ids` 
 and an `evidence` field. The `evidence` MUST be a short, verbatim quote (5-15 words) 
 copied exactly from those exact segment_ids. Do not paraphrase the evidence.
 owner: a person's name only if stated for that task, otherwise "unspecified".
-deadline: the phrase as spoken, only if stated, otherwise "unspecified".
+deadline: the phrase as spoken, only if stated. Resolve relative dates (e.g. 'tomorrow') to YYYY-MM-DD if the meeting date is provided, otherwise leave as spoken. If not stated, "unspecified".
 If nothing qualifies, return empty lists. The summary must not contain facts
 that are not in the transcript.
 

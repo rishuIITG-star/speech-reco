@@ -6,6 +6,7 @@ import WaveSurfer from 'wavesurfer.js';
 export default function ResultsScreen({ results, jobId }: { results: any, jobId?: string }) {
   const [activeTab, setActiveTab] = useState('decisions');
   const [actionItems, setActionItems] = useState<any[]>(results?.record?.action_items || []);
+  const [decisions, setDecisions] = useState<any[]>(results?.record?.decisions || []);
   const [decisionSearch, setDecisionSearch] = useState('');
   
   // WaveSurfer
@@ -89,7 +90,7 @@ export default function ResultsScreen({ results, jobId }: { results: any, jobId?
   };
 
   // Filtered decisions
-  const filteredDecisions = (record.decisions || []).filter((d: any) => 
+  const filteredDecisions = decisions.filter((d: any) => 
     d.text.toLowerCase().includes(decisionSearch.toLowerCase()) || 
     d.evidence.toLowerCase().includes(decisionSearch.toLowerCase())
   );
@@ -133,7 +134,7 @@ export default function ResultsScreen({ results, jobId }: { results: any, jobId?
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} className="flex items-center gap-2 px-space-md py-1.5 rounded-full bg-surface-container-highest cursor-default shadow-sm border border-outline-variant/20">
             <span className="font-label-code text-label-code text-ink-muted">Decisions:</span>
-            <span className="font-label-code text-label-code font-semibold text-ink-primary">{filteredDecisions.length} / {record.decisions?.length || 0}</span>
+            <span className="font-label-code text-label-code font-semibold text-ink-primary">{filteredDecisions.length} / {decisions.length}</span>
           </motion.div>
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -195,7 +196,27 @@ export default function ResultsScreen({ results, jobId }: { results: any, jobId?
               {activeTab === 'action-items' && (
                 <section>
                   <div className="flex items-center justify-between mb-6 border-b border-surface-container-high pb-4">
-                    <h2 className="font-headline-md text-headline-md text-ink-primary">Action Items</h2>
+                    <h2 className="font-headline-md text-headline-md text-ink-primary flex items-center gap-2">
+                      Action Items
+                      <button 
+                        onClick={async () => {
+                          try {
+                            const res = await fetch(`/api/results/${jobId}/save`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ action_items: actionItems })
+                            });
+                            if (res.ok) alert("Saved successfully!");
+                            else alert("Failed to save.");
+                          } catch (err) {
+                            console.error(err);
+                          }
+                        }}
+                        className="ml-4 text-sm px-3 py-1 bg-accent-forest text-surface rounded-full shadow hover:bg-accent-forest/90"
+                      >
+                        Save Changes
+                      </button>
+                    </h2>
                     <button 
                       onClick={() => setActionItems([{ task: 'New Action Item', owner: 'Unspecified', deadline: 'Unspecified', completed: false }, ...actionItems])}
                       className="flex items-center gap-2 px-4 py-2 bg-paper-subtle hover:bg-surface-container-high rounded-full font-button-text text-ink-primary border border-outline-variant/30 transition-colors"
@@ -327,7 +348,27 @@ export default function ResultsScreen({ results, jobId }: { results: any, jobId?
                     <div className="flex items-center justify-between pb-space-md mb-space-lg border-b border-surface-container-high">
                       <div className="flex items-center gap-space-sm">
                         <span className="w-3 h-3 rounded-full bg-accent-forest shadow-sm"></span>
-                        <h2 className="font-headline-md text-headline-md text-ink-primary">Agreed Decisions</h2>
+                        <h2 className="font-headline-md text-headline-md text-ink-primary flex items-center gap-2">
+                          Agreed Decisions
+                          <button 
+                            onClick={async () => {
+                              try {
+                                const res = await fetch(`/api/results/${jobId}/save`, {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ decisions: decisions })
+                                });
+                                if (res.ok) alert("Saved successfully!");
+                                else alert("Failed to save.");
+                              } catch (err) {
+                                console.error(err);
+                              }
+                            }}
+                            className="ml-4 text-sm px-3 py-1 bg-accent-forest text-surface rounded-full shadow hover:bg-accent-forest/90"
+                          >
+                            Save Changes
+                          </button>
+                        </h2>
                         <motion.span 
                           initial={{ scale: 0.8 }} animate={{ scale: 1 }}
                           className="px-space-md py-1 rounded-full bg-paper-subtle font-label-code text-label-code text-accent-forest font-bold border border-outline-variant/20"
@@ -373,9 +414,34 @@ export default function ResultsScreen({ results, jobId }: { results: any, jobId?
                                 )}
                               </div>
                             </div>
-                            <h3 className="font-headline-sm text-headline-sm text-ink-primary font-semibold leading-snug group-hover:text-accent-forest transition-colors">
-                              {decision.text}
-                            </h3>
+                            <div className="flex items-center gap-2">
+                              <input 
+                                type="text"
+                                value={decision.text}
+                                onChange={(e) => {
+                                  const newDecisions = [...decisions];
+                                  const index = decisions.findIndex(d => d === decision);
+                                  if (index !== -1) {
+                                    newDecisions[index] = { ...newDecisions[index], text: e.target.value };
+                                    setDecisions(newDecisions);
+                                  }
+                                }}
+                                className="w-full bg-transparent border-none p-0 focus:ring-0 font-headline-sm text-headline-sm text-ink-primary font-semibold leading-snug group-hover:text-accent-forest transition-colors"
+                              />
+                              <button 
+                                onClick={() => {
+                                  const newDecisions = [...decisions];
+                                  const index = decisions.findIndex(d => d === decision);
+                                  if (index !== -1) {
+                                    newDecisions.splice(index, 1);
+                                    setDecisions(newDecisions);
+                                  }
+                                }}
+                                className="p-2 text-error/70 hover:text-error hover:bg-error/10 rounded-full transition-colors shrink-0"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                             <div className="bg-paper-subtle rounded-lg p-space-lg relative overflow-hidden border border-outline-variant/20">
                               <div className="flex items-start gap-space-sm relative z-10">
                                 <blockquote className="font-headline-md italic text-ink-secondary text-[18px] leading-relaxed">
