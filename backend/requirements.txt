@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+python-multipart
+faster-whisper
+pydantic>=2.0
+pyyaml
+jellyfish
+rapidfuzz
+python-dotenv
+pytest
+sqlalchemy
+passlib[bcrypt]
+pyjwt

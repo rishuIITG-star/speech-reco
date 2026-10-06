@@ -1,0 +1,31 @@
+limits: 
+  max_upload_mb: 200
+  min_duration_s: 1.0
+  max_duration_s: 3600
+  silence_mean_db: -60
+asr:
+  engine: faster_whisper          # faster_whisper | whisperx
+  model: large-v3
+  fallback_models: [medium, small]
+  device: cpu                     # cpu because cublas64_12.dll is missing
+  compute_type_gpu: int8_float16
+  compute_type_cpu: int8
+  beam_size: 5
+  temperature: [0.0, 0.2, 0.4]
+  compression_ratio_threshold: 2.4
+  log_prob_threshold: -1.0
+  no_speech_threshold: 0.6
+  language: ""
+diarization: 
+  enabled: true
+refiner:   
+  provider: gemini
+  model: "gemini-3.5-flash"
+  temperature: 0
+extractor: 
+  provider: gemini
+  model: "gemini-3.5-flash"
+  temperature: 0
+grounding: 
+  evidence_min_ratio: 90
+  max_evidence_segments: 3
