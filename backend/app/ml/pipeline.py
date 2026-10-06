@@ -33,7 +33,13 @@ def run_pipeline(job: JobStatus, input_path: str, glossary: list = None):
             normalize_audio(input_file, norm_file)
             
             job.update(stage="transcribing", percent=10)
-            transcript = transcribe_audio(str(norm_file), glossary)
+            
+            stream_file = job.job_dir / "stream.jsonl"
+            def on_seg(seg):
+                with open(stream_file, "a", encoding="utf-8") as sf:
+                    sf.write(json.dumps(seg) + "\n")
+                    
+            transcript = transcribe_audio(str(norm_file), glossary, on_segment=on_seg)
             transcript = postfilter(transcript)
             
             with open(job.job_dir / "transcript.json", "w", encoding="utf-8") as f:

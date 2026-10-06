@@ -34,7 +34,7 @@ def get_model():
             
     return model_instance, diarization_pipeline
 
-def transcribe_audio(audio_path: str, glossary: list = None) -> Transcript:
+def transcribe_audio(audio_path: str, glossary: list = None, on_segment=None) -> Transcript:
     model, diarization_pipeline = get_model()
     
     initial_prompt = ""
@@ -58,7 +58,12 @@ def transcribe_audio(audio_path: str, glossary: list = None) -> Transcript:
         initial_prompt=initial_prompt if initial_prompt else None
     )
     
-    whisper_segments = list(segments_gen)
+    whisper_segments = []
+    for seg in segments_gen:
+        whisper_segments.append(seg)
+        if on_segment:
+            words = [{"word": w.word, "start": w.start, "end": w.end, "prob": w.probability} for w in seg.words] if seg.words else []
+            on_segment({"id": len(whisper_segments), "start": seg.start, "end": seg.end, "text": seg.text, "words": words})
     
     # Run Pyannote Diarization
     diarization_result = None

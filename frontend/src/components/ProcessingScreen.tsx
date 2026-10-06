@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 
 interface ProcessingScreenProps {
   status: any;
+  streamedSegments?: any[];
 }
 
-export default function ProcessingScreen({ status }: ProcessingScreenProps) {
+export default function ProcessingScreen({ status, streamedSegments = [] }: ProcessingScreenProps) {
   const navigate = useNavigate();
   let step = 1;
   const isFailed = status?.state === 'failed';
@@ -108,6 +109,35 @@ export default function ProcessingScreen({ status }: ProcessingScreenProps) {
             </div>
           </motion.div>
         ))}
+      </div>
+
+      <div className="mt-space-2xl bg-surface-container-low border border-outline-variant/30 rounded-xl p-space-md shadow-inner h-64 overflow-y-auto font-body-sm text-ink-secondary">
+        <h3 className="font-headline-sm text-ink-primary mb-2 flex items-center gap-2">
+          <span>Live Transcript</span>
+          {step === 1 && <span className="w-2 h-2 rounded-full bg-accent-forest animate-pulse"></span>}
+        </h3>
+        
+        {streamedSegments && streamedSegments.length > 0 ? (
+          <div className="space-y-2">
+            {streamedSegments.map((seg, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex gap-3"
+              >
+                <span className="text-ink-muted w-12 shrink-0">{new Date(seg.start * 1000).toISOString().substr(14, 5)}</span>
+                <span className="text-ink-primary">{seg.text}</span>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="animate-pulse space-y-3 mt-4">
+            <div className="h-4 bg-outline-variant/20 rounded w-3/4"></div>
+            <div className="h-4 bg-outline-variant/20 rounded w-1/2"></div>
+            <div className="h-4 bg-outline-variant/20 rounded w-5/6"></div>
+          </div>
+        )}
       </div>
     </motion.div>
   );

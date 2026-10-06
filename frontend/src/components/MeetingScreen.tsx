@@ -9,20 +9,20 @@ export default function MeetingScreen() {
   const [results, setResults] = useState<any>(null);
   const navigate = useNavigate();
 
+  const [streamedSegments, setStreamedSegments] = useState<any[]>([]);
+
   useEffect(() => {
     if (!id) return;
 
-    const interval = setInterval(async () => {
+    const eventSource = new EventSource(`/api/status/${id}/stream`);
+
+    eventSource.addEventListener('status', async (e) => {
       try {
-        const res = await fetch(`/api/status/${id}`);
-        
-        if (!res.ok) return;
-        
-        const statusData = await res.json();
+        const statusData = JSON.parse(e.data);
         setStatus(statusData);
         
         if (statusData.state === 'done') {
-          clearInterval(interval);
+          eventSource.close();
           const resultsRes = await fetch(`/api/results/${id}`);
           if (resultsRes.ok) {
             const resData = await resultsRes.json();
@@ -31,19 +31,35 @@ export default function MeetingScreen() {
             setStatus({ state: 'failed', error: { message: "Error fetching results" } });
           }
         } else if (statusData.state === 'failed') {
-          clearInterval(interval);
+          eventSource.close();
         }
       } catch (err) {
         console.error(err);
       }
-    }, 1000); // Check every 1 second
+    });
 
-    return () => clearInterval(interval);
-  }, [id, navigate]);
+    eventSource.addEventListener('segment', (e) => {
+      try {
+        const segData = JSON.parse(e.data);
+        setStreamedSegments(prev => [...prev, segData]);
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    eventSource.onerror = (e) => {
+      console.error('SSE Error:', e);
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [id]);
 
   if (results) {
     return <ResultsScreen results={results} jobId={id} />;
   }
 
-  return <ProcessingScreen status={status} />;
+  return <ProcessingScreen status={status} streamedSegments={streamedSegments} />;
 }

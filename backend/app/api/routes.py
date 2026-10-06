@@ -142,3 +142,49 @@ def search_meetings(q: str, current_user: User = Depends(get_current_user), db: 
 @router.get("/health")
 def health():
     return {"status": "ok"}
+
+import asyncio
+from fastapi.responses import StreamingResponse
+
+@router.get("/status/{job_id}/stream")
+async def stream_status(job_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    meeting = db.query(Meeting).filter(Meeting.job_id == job_id, Meeting.user_id == current_user.id).first()
+    if not meeting:
+        raise HTTPException(status_code=404, detail="Meeting not found")
+        
+    job = JobStatus(job_id)
+    stream_file = job.job_dir / "stream.jsonl"
+    
+    async def event_generator():
+        last_state = None
+        last_percent = -1
+        f_pos = 0
+        
+        while True:
+            status = job.read()
+            if status:
+                state = status.get("state")
+                percent = status.get("percent")
+                
+                if state != last_state or percent != last_percent:
+                    yield f"event: status\ndata: {json.dumps(status)}\n\n"
+                    last_state = state
+                    last_percent = percent
+                    
+                if state in ["done", "failed"]:
+                    # Wait briefly to let the last bits write
+                    await asyncio.sleep(0.5)
+                    break
+                    
+            if stream_file.exists():
+                with open(stream_file, "r", encoding="utf-8") as f:
+                    f.seek(f_pos)
+                    lines = f.readlines()
+                    f_pos = f.tell()
+                    for line in lines:
+                        if line.strip():
+                            yield f"event: segment\ndata: {line.strip()}\n\n"
+                            
+            await asyncio.sleep(1.0)
+            
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
