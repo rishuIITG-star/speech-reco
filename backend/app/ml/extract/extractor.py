@@ -11,7 +11,7 @@ def extract_record(job_id: str, transcript: RefinedTranscript, asr_model: str) -
     llm = GeminiLLM(
         model=config.extractor.model,
         temperature=config.extractor.temperature,
-        fallbacks=["gemini-3.8-flash", "gemini-3.7-flash", "gemini-2.5-flash"],
+        fallbacks=["gemini-3.8-flash"],
         forbidden_models=[transcript.refiner_model] if transcript.refiner_model else []
     )
     

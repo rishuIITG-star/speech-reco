@@ -12,7 +12,7 @@ def refine(transcript: Transcript, glossary: list = None) -> RefinedTranscript:
         llm = GeminiLLM(
             model=config.refiner.model,
             temperature=config.refiner.temperature,
-            fallbacks=["gemini-3.5-flash-lite", "gemini-3.1-flash-lite"]
+            fallbacks=["gemini-3.8-flash"]
         )
     else:
         llm = OllamaLLM(config.refiner.model, config.refiner.temperature)
@@ -54,16 +54,16 @@ def refine(transcript: Transcript, glossary: list = None) -> RefinedTranscript:
                 
                 if refined is None:
                     # Fallback if missing
-                    refined_segments.append(RefinedSegment(id=seg.id, text=original, speaker=seg.speaker, start=seg.start, end=seg.end, changed=False))
+                    refined_segments.append(RefinedSegment(id=seg.id, text=original, speaker_id=seg.speaker_id, speaker_name=seg.speaker_name, overlap=seg.overlap, start=seg.start, end=seg.end, changed=False))
                     continue
                     
                 is_valid, reason = validate_segment(original, refined)
                 if not is_valid:
                     print(f"Segment {seg.id} failed validation: {reason}. Falling back to raw.")
-                    refined_segments.append(RefinedSegment(id=seg.id, text=original, speaker=seg.speaker, start=seg.start, end=seg.end, changed=False))
+                    refined_segments.append(RefinedSegment(id=seg.id, text=original, speaker_id=seg.speaker_id, speaker_name=seg.speaker_name, overlap=seg.overlap, start=seg.start, end=seg.end, changed=False))
                 else:
                     is_changed = original != refined
-                    refined_segments.append(RefinedSegment(id=seg.id, text=refined, speaker=seg.speaker, start=seg.start, end=seg.end, changed=is_changed))
+                    refined_segments.append(RefinedSegment(id=seg.id, text=refined, speaker_id=seg.speaker_id, speaker_name=seg.speaker_name, overlap=seg.overlap, start=seg.start, end=seg.end, changed=is_changed))
                     
         except Exception as e:
             from app.core.errors import AppError

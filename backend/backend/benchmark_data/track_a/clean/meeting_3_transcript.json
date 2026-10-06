@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "start": 0.0,
+    "end": 6.0,
+    "speaker_id": "SPEAKER_01",
+    "text": "The new logo looks good, but the color is off. Let's change the primary color to hex 1A2B3C."
+  },
+  {
+    "id": 2,
+    "start": 6.0,
+    "end": 9.0,
+    "speaker_id": "SPEAKER_02",
+    "text": "I can make that change right now. Should I also update the typography?"
+  },
+  {
+    "id": 3,
+    "start": 9.0,
+    "end": 12.0,
+    "speaker_id": "SPEAKER_01",
+    "text": "No, keep the font as is for now. Just update the color by EOD."
+  }
+]

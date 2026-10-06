@@ -13,8 +13,9 @@ Definitions:
 - action item: someone committed to, or was explicitly assigned, specific work.
   A general wish or an unassigned remark is not an action item.
 
-Every decision, proposal and action item must include segment_ids and a short
-evidence quote copied verbatim from those segments.
+Every decision, proposal and action item MUST include an array of `segment_ids` (integers)
+and an `evidence` field. The `evidence` MUST be a short, verbatim quote (5-15 words) 
+copied exactly from those exact segment_ids. Do not paraphrase the evidence.
 owner: a person's name only if stated for that task, otherwise "unspecified".
 deadline: the phrase as spoken, only if stated, otherwise "unspecified".
 If nothing qualifies, return empty lists. The summary must not contain facts

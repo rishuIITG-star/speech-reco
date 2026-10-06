@@ -1,0 +1,27 @@
+{
+  "decisions": [
+    {
+      "text": "Change primary logo color to #1A2B3C",
+      "evidence_segment_ids": [
+        1
+      ]
+    },
+    {
+      "text": "Keep current typography/font",
+      "evidence_segment_ids": [
+        3
+      ]
+    }
+  ],
+  "action_items": [
+    {
+      "text": "Update logo color",
+      "owner": "SPEAKER_02",
+      "deadline": "EOD",
+      "evidence_segment_ids": [
+        2,
+        3
+      ]
+    }
+  ]
+}

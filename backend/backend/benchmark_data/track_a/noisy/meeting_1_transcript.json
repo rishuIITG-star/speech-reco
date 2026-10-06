@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "start": 0.0,
+    "end": 5.0,
+    "speaker_id": "SPEAKER_00",
+    "text": "all right lets kickoff the project decided we migrate to post grass"
+  },
+  {
+    "id": 2,
+    "start": 5.0,
+    "end": 8.5,
+    "speaker_id": "SPEAKER_01",
+    "text": "sounds good alice review database schema next fry day"
+  },
+  {
+    "id": 3,
+    "start": 8.5,
+    "end": 10.0,
+    "speaker_id": "SPEAKER_02",
+    "text": "yes I will haven done"
+  }
+]

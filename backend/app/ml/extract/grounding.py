@@ -3,9 +3,20 @@ from app.core.config import config
 from app.ml.schemas import ActionItem, Decision, ProposalNotAgreed, GroundingReport, UNSPEC
 import re
 
-def fuzzy_match(evidence: str, window_text: str) -> bool:
-    score = fuzz.partial_ratio(evidence.lower(), window_text.lower())
-    return score >= config.grounding.evidence_min_ratio
+def cascade_match(evidence: str, window_text: str) -> tuple[bool, str]:
+    ev = evidence.lower().strip()
+    text = window_text.lower()
+    
+    if ev in text:
+        return True, "exact"
+        
+    if fuzz.partial_ratio(ev, text) >= 85:
+        return True, "fuzzy"
+        
+    if fuzz.token_set_ratio(ev, text) >= 60:
+        return True, "semantic"
+        
+    return False, "unverified"
 
 def check_owner_deadline(item: ActionItem, window_text: str) -> list[dict]:
     downgrades = []
@@ -57,18 +68,20 @@ def ground_items(items: dict, segments: list) -> tuple[dict, GroundingReport]:
         valid_sids = [sid for sid in d.segment_ids if sid in seg_map]
         d.timestamp = seg_map[valid_sids[0]].start if valid_sids else 0.0
         
-        if not fuzzy_match(d.evidence, window_text):
+        is_match, match_type = cascade_match(d.evidence, window_text)
+        if not is_match:
             report.dropped.append({"kind": "decision", "text": d.text, "reason": "evidence_mismatch"})
             continue
             
         if is_hedging(d.evidence):
             out_proposals.append(ProposalNotAgreed(
-                text=d.text, evidence=d.evidence, segment_ids=d.segment_ids, timestamp=d.timestamp, verified=True
+                text=d.text, evidence=d.evidence, segment_ids=d.segment_ids, timestamp=d.timestamp, verified=True, match_type=match_type
             ))
             report.downgraded.append({"kind": "decision", "field": "type", "text": d.text})
             continue
             
         d.verified = True
+        d.match_type = match_type
         out_decisions.append(d)
         report.kept += 1
         
@@ -78,7 +91,8 @@ def ground_items(items: dict, segments: list) -> tuple[dict, GroundingReport]:
         valid_sids = [sid for sid in a.segment_ids if sid in seg_map]
         a.timestamp = seg_map[valid_sids[0]].start if valid_sids else 0.0
         
-        if not fuzzy_match(a.evidence, window_text):
+        is_match, match_type = cascade_match(a.evidence, window_text)
+        if not is_match:
             report.dropped.append({"kind": "action_item", "text": a.task, "reason": "evidence_mismatch"})
             continue
             
@@ -86,6 +100,7 @@ def ground_items(items: dict, segments: list) -> tuple[dict, GroundingReport]:
         report.downgraded.extend(downgrades)
             
         a.verified = True
+        a.match_type = match_type
         out_actions.append(a)
         report.kept += 1
         
@@ -96,8 +111,10 @@ def ground_items(items: dict, segments: list) -> tuple[dict, GroundingReport]:
         valid_sids = [sid for sid in p.segment_ids if sid in seg_map]
         p.timestamp = seg_map[valid_sids[0]].start if valid_sids else 0.0
             
-        if fuzzy_match(p.evidence, window_text):
+        is_match, match_type = cascade_match(p.evidence, window_text)
+        if is_match:
             p.verified = True
+            p.match_type = match_type
             report.kept += 1
             final_proposals.append(p)
         else:

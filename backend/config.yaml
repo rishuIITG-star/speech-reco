@@ -20,11 +20,11 @@ diarization:
   enabled: true
 refiner:   
   provider: gemini
-  model: "gemini-3.5-flash"
+  model: "gemini-3.8-flash"
   temperature: 0
 extractor: 
   provider: gemini
-  model: "gemini-3.5-flash"
+  model: "gemini-3.8-flash"
   temperature: 0
 grounding: 
   evidence_min_ratio: 90

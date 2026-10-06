@@ -10,22 +10,3 @@
 - **evidence_recall**: >= 60.0%
 
 ## Track A: CLEAN
-- **Decision Precision:** 0.0%
-- **Decision Recall:** 0.0%
-- **Action Precision:** 100.0%
-- **Action Recall:** 100.0%
-- **Owner Accuracy:** 100.0%
-- **Evidence Precision:** 0.0%
-- **Evidence Recall:** 0.0%
-
-## Track A: NOISY
-- **Decision Precision:** 0.0%
-- **Decision Recall:** 0.0%
-- **Action Precision:** 100.0%
-- **Action Recall:** 100.0%
-- **Owner Accuracy:** 100.0%
-- **Evidence Precision:** 0.0%
-- **Evidence Recall:** 0.0%
-
-## Track B: TTS Smoke Test
-- **Status:** Not run (Deferred until real audio tracking is required)

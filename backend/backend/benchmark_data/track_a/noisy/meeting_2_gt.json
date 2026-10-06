@@ -1,0 +1,21 @@
+{
+  "decisions": [
+    {
+      "text": "Cut Q3 marketing spend by 15%",
+      "evidence_segment_ids": [
+        1,
+        2
+      ]
+    }
+  ],
+  "action_items": [
+    {
+      "text": "Send revised Q3 budget to the board",
+      "owner": "Bob",
+      "deadline": "tomorrow morning",
+      "evidence_segment_ids": [
+        3
+      ]
+    }
+  ]
+}

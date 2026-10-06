@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "start": 0.0,
+    "end": 4.0,
+    "speaker_id": "SPEAKER_01",
+    "text": "The Q4 roadmap is finalized. We'll drop the mobile app feature for now."
+  },
+  {
+    "id": 2,
+    "start": 4.0,
+    "end": 8.0,
+    "speaker_id": "SPEAKER_00",
+    "text": "Wait, we can't drop it. Let's just delay it to Q1 instead of dropping entirely."
+  },
+  {
+    "id": 3,
+    "start": 8.0,
+    "end": 10.0,
+    "speaker_id": "SPEAKER_01",
+    "text": "Okay, agreed. Delay to Q1."
+  },
+  {
+    "id": 4,
+    "start": 10.0,
+    "end": 14.0,
+    "speaker_id": "SPEAKER_02",
+    "text": "Diana, please update the JIRA board to reflect the Q1 shift by tonight."
+  }
+]

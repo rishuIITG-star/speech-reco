@@ -1,0 +1,21 @@
+{
+  "decisions": [
+    {
+      "text": "Delay mobile app feature to Q1 (instead of dropping)",
+      "evidence_segment_ids": [
+        2,
+        3
+      ]
+    }
+  ],
+  "action_items": [
+    {
+      "text": "Update JIRA board with Q1 shift",
+      "owner": "Diana",
+      "deadline": "tonight",
+      "evidence_segment_ids": [
+        4
+      ]
+    }
+  ]
+}

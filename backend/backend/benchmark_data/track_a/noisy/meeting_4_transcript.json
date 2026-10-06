@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "start": 0.0,
+    "end": 5.0,
+    "speaker_id": "SPEAKER_00",
+    "text": "switching cloud provider from a w as to g c p start next month"
+  },
+  {
+    "id": 2,
+    "start": 5.0,
+    "end": 8.0,
+    "speaker_id": "SPEAKER_01",
+    "text": "charlie youll lead infra structure team"
+  },
+  {
+    "id": 3,
+    "start": 8.0,
+    "end": 11.0,
+    "speaker_id": "SPEAKER_02",
+    "text": "got it draft migration plan october fifteen"
+  }
+]

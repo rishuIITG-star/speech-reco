@@ -1,0 +1,21 @@
+{
+  "decisions": [
+    {
+      "text": "Migrate to PostgreSQL",
+      "evidence_segment_ids": [
+        1
+      ]
+    }
+  ],
+  "action_items": [
+    {
+      "text": "Review database schema",
+      "owner": "Alice",
+      "deadline": "next Friday",
+      "evidence_segment_ids": [
+        2,
+        3
+      ]
+    }
+  ]
+}

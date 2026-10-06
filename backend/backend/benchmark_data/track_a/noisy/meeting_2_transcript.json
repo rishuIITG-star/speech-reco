@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "start": 0.0,
+    "end": 4.0,
+    "speaker_id": "SPEAKER_00",
+    "text": "welcome to budget review need to cut cue three marketing spend fifteen percent"
+  },
+  {
+    "id": 2,
+    "start": 4.0,
+    "end": 7.0,
+    "speaker_id": "SPEAKER_01",
+    "text": "steep cut agree have to do"
+  },
+  {
+    "id": 3,
+    "start": 7.0,
+    "end": 12.0,
+    "speaker_id": "SPEAKER_00",
+    "text": "great bob send revise cue three budget board tomorrow morning"
+  }
+]

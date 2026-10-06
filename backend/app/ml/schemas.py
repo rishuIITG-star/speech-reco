@@ -16,6 +16,7 @@ class Decision(BaseModel):
     segment_ids: List[int]
     timestamp: Optional[float] = None
     verified: bool = False
+    match_type: Literal["exact", "fuzzy", "semantic", "unverified", ""] = ""
 
 class ProposalNotAgreed(BaseModel):
     text: str
@@ -23,6 +24,7 @@ class ProposalNotAgreed(BaseModel):
     segment_ids: List[int]
     timestamp: Optional[float] = None
     verified: bool = False
+    match_type: Literal["exact", "fuzzy", "semantic", "unverified", ""] = ""
 
 class ActionItem(_Unspec):
     task: str
@@ -32,6 +34,7 @@ class ActionItem(_Unspec):
     segment_ids: List[int]
     timestamp: Optional[float] = None
     verified: bool = False
+    match_type: Literal["exact", "fuzzy", "semantic", "unverified", ""] = ""
 
 class MinutesTopic(BaseModel):
     title: str
@@ -76,7 +79,9 @@ class Segment(BaseModel):
     text: str
     avg_logprob: Optional[float] = None
     no_speech_prob: Optional[float] = None
-    speaker: Optional[str] = None
+    speaker_id: Optional[str] = None
+    speaker_name: Optional[str] = None
+    overlap: bool = False
     words: List[Word] = []
 
 class Transcript(BaseModel):
@@ -97,7 +102,9 @@ class Edit(BaseModel):
 class RefinedSegment(BaseModel):
     id: int
     text: str
-    speaker: Optional[str] = None
+    speaker_id: Optional[str] = None
+    speaker_name: Optional[str] = None
+    overlap: bool = False
     start: Optional[float] = None
     end: Optional[float] = None
     changed: bool = False

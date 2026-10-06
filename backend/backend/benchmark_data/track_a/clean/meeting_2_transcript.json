@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "start": 0.0,
+    "end": 4.0,
+    "speaker_id": "SPEAKER_00",
+    "text": "Welcome to the budget review. We need to cut the Q3 marketing spend by 15%."
+  },
+  {
+    "id": 2,
+    "start": 4.0,
+    "end": 7.0,
+    "speaker_id": "SPEAKER_01",
+    "text": "That's a steep cut, but I agree we have to do it."
+  },
+  {
+    "id": 3,
+    "start": 7.0,
+    "end": 12.0,
+    "speaker_id": "SPEAKER_00",
+    "text": "Great. Bob, please send the revised Q3 budget to the board by tomorrow morning."
+  }
+]

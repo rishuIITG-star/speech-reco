@@ -1,0 +1,21 @@
+{
+  "decisions": [
+    {
+      "text": "Switch cloud provider from AWS to GCP",
+      "evidence_segment_ids": [
+        1
+      ]
+    }
+  ],
+  "action_items": [
+    {
+      "text": "Draft infrastructure migration plan",
+      "owner": "Charlie",
+      "deadline": "October 15th",
+      "evidence_segment_ids": [
+        2,
+        3
+      ]
+    }
+  ]
+}
