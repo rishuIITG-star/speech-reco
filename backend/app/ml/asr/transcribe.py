@@ -1,32 +1,36 @@
-from faster_whisper import WhisperModel
 from app.core.config import config
 from app.ml.schemas import Transcript, Segment, Word
 import os
-try:
-    from pyannote.audio import Pipeline
-except ImportError:
-    Pipeline = None
 
 model_instance = None
 diarization_pipeline = None
 
 def get_model():
     global model_instance, diarization_pipeline
+    
+    if config.asr.engine == "groq":
+        return None, None
+        
     if model_instance is None:
+        from faster_whisper import WhisperModel
         device = "cpu" if config.asr.device == "auto" else config.asr.device
+        model_name = config.asr.model
+        if model_name.startswith("whisper-"):
+            model_name = model_name.replace("whisper-", "")
         model_instance = WhisperModel(
-            config.asr.model, 
+            model_name, 
             device=device, 
             compute_type=config.asr.compute_type_cpu
         )
         
-    if diarization_pipeline is None and config.diarization.enabled and Pipeline and os.getenv("HF_TOKEN"):
+    if diarization_pipeline is None and config.diarization.enabled and os.getenv("HF_TOKEN"):
         try:
+            from pyannote.audio import Pipeline
+            import torch
             diarization_pipeline = Pipeline.from_pretrained(
                 "pyannote/speaker-diarization-3.1",
                 token=os.getenv("HF_TOKEN")
             )
-            import torch
             if config.asr.device == "cuda" and torch.cuda.is_available():
                 diarization_pipeline.to(torch.device("cuda"))
         except Exception as e:
@@ -34,7 +38,12 @@ def get_model():
             
     return model_instance, diarization_pipeline
 
-def transcribe_audio(audio_path: str, glossary: list = None, on_segment=None) -> Transcript:
+def transcribe_audio(audio_path: str, glossary: list = None, on_segment=None, job=None) -> Transcript:
+    if config.asr.engine == "groq":
+        from app.ml.asr.groq_transcriber import GroqTranscriber
+        transcriber = GroqTranscriber()
+        return transcriber.transcribe(audio_path, glossary, on_segment, job)
+
     model, diarization_pipeline = get_model()
     
     initial_prompt = ""
@@ -78,7 +87,7 @@ def transcribe_audio(audio_path: str, glossary: list = None, on_segment=None) ->
         words = []
         if s.words:
             for w in s.words:
-                words.append(Word(w=w.word, start=w.start, end=w.end, prob=w.probability))
+                words.append(Word(word=w.word, start=w.start, end=w.end, prob=w.probability))
                 
         # Map speaker using diarization
         speaker = "SPEAKER_00"

@@ -21,9 +21,12 @@ def mock_get_db():
     db.query.return_value.filter.return_value.order_by.return_value.limit.return_value.all.return_value = [mock_meeting]
     yield db
 
-# Override app dependencies
-app.dependency_overrides[get_current_user] = mock_get_current_user
-app.dependency_overrides[get_db] = mock_get_db
+@pytest.fixture(autouse=True)
+def override_deps():
+    app.dependency_overrides[get_current_user] = mock_get_current_user
+    app.dependency_overrides[get_db] = mock_get_db
+    yield
+    app.dependency_overrides.clear()
 
 client = TestClient(app)
 
@@ -37,9 +40,11 @@ def test_health_contract():
 @patch("app.api.routes.enqueue_job")
 def test_process_audio_contract(mock_enqueue, mock_create_job):
     """Verify POST /process accepts audio and returns a 202 with job_id."""
+    from pathlib import Path
     mock_job = MagicMock()
     mock_job.job_id = "new-job-456"
-    mock_job.job_dir = MagicMock()
+    import tempfile
+    mock_job.job_dir = Path(tempfile.mkdtemp())
     mock_create_job.return_value = mock_job
     
     # Send dummy file

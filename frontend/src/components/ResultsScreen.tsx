@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, CalendarPlus, FileText, CheckCircle2, PlayCircle, Activity, Download, Plus, Trash2, Search, PauseCircle } from 'lucide-react';
 import WaveSurfer from 'wavesurfer.js';

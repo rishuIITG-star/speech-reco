@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api import routes, auth
 from app.core.database import engine, Base
 from app.ml.asr.transcribe import get_model as init_asr
-from app.core.config import config
+from app.core.config import config, ALLOWED_ORIGINS
 from app.core.worker import start_worker
 from dotenv import load_dotenv
 
@@ -14,12 +14,17 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Inter IIT Meeting Assistant")
 
+origins = ["http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173"]
+if ALLOWED_ORIGINS:
+    origins.extend([o.strip() for o in ALLOWED_ORIGINS.split(",") if o.strip()])
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Content-Range", "Accept-Ranges", "Content-Length", "Content-Disposition"],
 )
 
 @app.on_event("startup")

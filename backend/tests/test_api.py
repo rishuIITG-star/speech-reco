@@ -12,7 +12,7 @@ def test_health():
 
 def test_status_not_found():
     response = client.get("/api/status/not-a-job")
-    assert response.json() == {}
+    assert response.status_code == 404
 
 def test_results_not_found():
     response = client.get("/api/results/not-a-job")

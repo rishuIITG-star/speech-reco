@@ -3,7 +3,7 @@ from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator, ConfigDict
 
 from app.core.database import get_db
 from app.core.models import User
@@ -15,7 +15,7 @@ class UserCreate(BaseModel):
     email: str
     password: str
     
-    @validator('email')
+    @field_validator('email')
     def validate_email(cls, v):
         if not re.match(r"[^@]+@[^@]+\.[^@]+", v):
             raise ValueError('Invalid email address')
@@ -25,8 +25,7 @@ class UserResponse(BaseModel):
     id: int
     email: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class Token(BaseModel):
     access_token: str

@@ -9,7 +9,7 @@ export default function UploadScreen() {
   const [recordingTime, setRecordingTime] = useState(0);
   const [glossary, setGlossary] = useState("");
   
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);

@@ -31,12 +31,13 @@ def test_ground_items():
         "action_items": []
     }
     
-    transcript_text_map = {
-        1: "Priya confirmed we have consensus to execute.",
-        2: "Should we migrate?"
-    }
+    from app.ml.schemas import Segment
+    segments = [
+        Segment(id=1, start=0.0, end=1.0, text="Priya confirmed we have consensus to execute."),
+        Segment(id=2, start=1.0, end=2.0, text="Should we migrate?")
+    ]
     
-    grounded, report = ground_items(items, transcript_text_map)
+    grounded, report = ground_items(items, segments)
     assert len(grounded["decisions"]) == 1
     assert len(grounded["proposals_not_agreed"]) == 1
     

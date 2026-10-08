@@ -40,7 +40,7 @@ def test_register_and_login():
     assert "access_token" in res.json()
 
 def test_protected_routes():
-    res = client.get("/api/history")
+    res = client.get("/api/history", headers={"Authorization": "Bearer badtoken"})
     assert res.status_code == 401
 
 def test_ownership_isolation():

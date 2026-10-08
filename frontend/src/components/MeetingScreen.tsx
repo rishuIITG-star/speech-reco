@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import ProcessingScreen from './ProcessingScreen';
 import ResultsScreen from './ResultsScreen';
 
@@ -7,7 +7,7 @@ export default function MeetingScreen() {
   const { id } = useParams<{ id: string }>();
   const [status, setStatus] = useState<any>(null);
   const [results, setResults] = useState<any>(null);
-  const navigate = useNavigate();
+
 
   const [streamedSegments, setStreamedSegments] = useState<any[]>([]);
 

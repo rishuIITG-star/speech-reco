@@ -33,4 +33,4 @@ def test_validate_segment_length_insane():
     ref = "Yes, I completely agree with everything you just said and more."
     is_valid, reason = validate_segment(orig, ref)
     assert not is_valid
-    assert "Length ratio" in reason
+    assert "Change ratio" in reason

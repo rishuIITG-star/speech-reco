@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Calendar, Clock, ArrowRight, FileText, Plus, LogOut } from 'lucide-react';
+import { Search, Calendar, ArrowRight, FileText, Plus } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 
 export default function DashboardScreen() {

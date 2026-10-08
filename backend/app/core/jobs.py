@@ -7,9 +7,10 @@ from typing import Optional
 from datetime import datetime
 from app.core.database import SessionLocal
 from app.core.models import Meeting
+from app.core.config import JOBS_DIR
 
 class JobStatus:
-    def __init__(self, job_id: str, jobs_dir: str = "jobs"):
+    def __init__(self, job_id: str, jobs_dir: str = JOBS_DIR):
         self.job_id = job_id
         self.job_dir = Path(jobs_dir) / job_id
         self.status_file = self.job_dir / "status.json"

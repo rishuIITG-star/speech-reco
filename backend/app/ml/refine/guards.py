@@ -58,7 +58,7 @@ def validate_segment(original: str, refined: str, glossary: list = None) -> tupl
         sm = SequenceMatcher(None, orig_words, ref_words)
         # Ratio is 2*M / (T), distance is 1 - ratio
         change_ratio = 1.0 - sm.ratio()
-        if change_ratio > 0.15:
-            return False, "Change ratio exceeds 15%"
+        if change_ratio > 0.25:
+            return False, "Change ratio exceeds 25%"
             
     return True, "ok"

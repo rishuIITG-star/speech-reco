@@ -12,7 +12,14 @@ def get_candidates(transcript: Transcript, glossary: list) -> dict:
     for seg in transcript.segments:
         for word in seg.words:
             w = word.w.strip(".,!?\"'")
+            
+            is_suspect = False
             if word.prob is not None and word.prob < 0.6:
+                is_suspect = True
+            elif word.prob is None and seg.avg_logprob is not None and seg.avg_logprob < -0.6:
+                is_suspect = True
+                
+            if is_suspect:
                 w_meta = jellyfish.metaphone(w)
                 best_match = None
                 best_score = 0

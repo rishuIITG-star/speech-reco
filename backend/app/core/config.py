@@ -56,6 +56,29 @@ def load_config(config_path: str = "config.yaml") -> AppConfig:
         data = yaml.safe_load(f)
         
     # Override with env variables if present
+    if os.getenv("ASR_ENGINE"):
+        data["asr"]["engine"] = os.getenv("ASR_ENGINE")
+    
+    if os.getenv("GROQ_STT_MODEL"):
+        data["asr"]["model"] = os.getenv("GROQ_STT_MODEL")
+    elif data["asr"]["engine"] == "groq" and data["asr"]["model"] not in ["whisper-large-v3"]:
+        data["asr"]["model"] = "whisper-large-v3" # default for groq if not specified in config
+
+    if data["asr"]["engine"] == "groq":
+        data["diarization"]["enabled"] = False
+        
+    if os.getenv("DIARIZATION_ENABLED") is not None:
+        val = os.getenv("DIARIZATION_ENABLED").lower()
+        if data["asr"]["engine"] == "groq":
+            data["diarization"]["enabled"] = False
+        else:
+            data["diarization"]["enabled"] = val in ["true", "1", "yes"]
+
+    if os.getenv("MAX_UPLOAD_MB"):
+        data["limits"]["max_upload_mb"] = int(os.getenv("MAX_UPLOAD_MB"))
+    if os.getenv("MAX_DURATION_MIN"):
+        data["limits"]["max_duration_s"] = float(os.getenv("MAX_DURATION_MIN")) * 60
+
     if os.getenv("REFINER_PROVIDER"):
         data["refiner"]["provider"] = os.getenv("REFINER_PROVIDER")
     if os.getenv("REFINER_MODEL"):
@@ -74,3 +97,8 @@ config = load_config()
 # Read env variables securely
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 HF_TOKEN = os.getenv("HF_TOKEN")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS")
+JOBS_DIR = os.getenv("JOBS_DIR", "jobs")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./speech_reco.db")
+

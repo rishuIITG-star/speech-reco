@@ -39,7 +39,7 @@ def run_pipeline(job: JobStatus, input_path: str, glossary: list = None):
                 with open(stream_file, "a", encoding="utf-8") as sf:
                     sf.write(json.dumps(seg) + "\n")
                     
-            transcript = transcribe_audio(str(norm_file), glossary, on_segment=on_seg)
+            transcript = transcribe_audio(str(norm_file), glossary, on_segment=on_seg, job=job)
             transcript = postfilter(transcript)
             
             with open(job.job_dir / "transcript.json", "w", encoding="utf-8") as f:

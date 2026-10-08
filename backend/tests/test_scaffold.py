@@ -6,7 +6,7 @@ from app.ml.schemas import ActionItem
 
 def test_config_loaded():
     assert config.limits.max_upload_mb == 200
-    assert config.asr.engine == "faster_whisper"
+    assert config.asr.engine in ("faster_whisper", "groq")
     assert config.extractor.provider == "gemini"
 
 def test_errors():
